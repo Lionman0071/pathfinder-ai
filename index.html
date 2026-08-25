@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PathFinder AI</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+</head>
+<body>
+    <datalist id="degree-options">
+        <option value="มัธยมศึกษาปีที่ 3 (ม.3)"></option>
+        <option value="มัธยมศึกษาปีที่ 6 (ม.6)"></option>
+        <option value="ประกาศนียบัตรวิชาชีพ (ปวช.)"></option>
+        <option value="ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)"></option>
+        <option value="ปริญญาตรี"></option>
+        <option value="ปริญญาโท"></option>
+        <option value="ปริญญาเอก"></option>
+    </datalist>
+
+    <div class="app-container">
+        <header class="app-header">
+            <b>PathFinder AI</b>
+            <p>สร้าง Resume และค้นหาเส้นทางอาชีพที่ใช่</p>
+        </header>
+        
+        <main class="app-content">
+            <form id="pathfinderForm" class="data-form">
+                
+                <button type="button" id="toggle-personal-info" class="toggle-btn">
+                    <span id="toggle-icon" class="plus-icon">+</span> เพิ่มข้อมูลส่วนตัว (ลงใน Resume / ข้ามได้)
+                </button>
+                
+                <div id="personal-info-section" class="personal-info-box hidden">
+                    
+                    <div class="image-upload-container">
+                        <input type="file" id="user-image" accept="image/*" hidden>
+                        <label for="user-image" class="image-upload-box" id="image-preview-label">
+                            <div class="upload-icon">📷</div>
+                            <div class="upload-text">อัปโหลดรูปถ่าย<br>(1.5 นิ้ว)</div>
+                        </label>
+                    </div>
+
+                    <div class="input-group">
+                        <label>ชื่อ - นามสกุล</label>
+                        <input type="text" id="user-name" placeholder="เช่น สมชาย ใจดี">
+                    </div>
+                    <div class="input-group">
+                        <label>อธิบายเกี่ยวกับตัวคุณ (Profile Summary)</label>
+                        <textarea id="user-summary" rows="3" placeholder="เช่น เป็นคนชอบเรียนรู้เทคโนโลยีใหม่ๆ มุ่งมั่นพัฒนาตัวเอง..."></textarea>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>สัญชาติ</label>
+                            <input type="text" id="user-nationality" placeholder="เช่น ไทย">
+                        </div>
+                        <div class="input-group">
+                            <label>เชื้อชาติ</label>
+                            <input type="text" id="user-ethnicity" placeholder="เช่น ไทย">
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>เบอร์โทรศัพท์มือถือ</label>
+                            <input type="text" id="user-phone" placeholder="080-000-0000" maxlength="12">
+                        </div>
+                        <div class="input-group">
+                            <label>อีเมล</label>
+                            <input type="email" id="user-email" placeholder="email@example.com">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>ลิงก์ผลงาน (LinkedIn / GitHub)</label>
+                            <input type="text" id="user-portfolio" placeholder="เช่น linkedin.com/in/username">
+                        </div>
+                        <div class="input-group">
+                            <label>ที่อยู่ (ย่อ)</label>
+                            <input type="text" id="user-address" placeholder="เช่น กรุงเทพมหานคร">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>งานอดิเรก (Hobbies)</label>
+                        <input type="text" id="user-hobby" placeholder="เช่น อ่านหนังสือ, ถ่ายภาพ, เล่นดนตรี, ปั่นจักรยาน">
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="input-group">
+                    <label>1. ระดับการศึกษา (บังคับ)</label>
+                    <div class="dynamic-list" id="list-education">
+                        <div class="dynamic-item edu-item">
+                            <div class="autocomplete-wrapper edu-col-1">
+                                <input type="text" class="edu-degree" placeholder="ระดับการศึกษา" required autocomplete="off">
+                            </div>
+                            <input type="text" class="edu-major edu-col-2" placeholder="สาขาวิชา/แผนการเรียน" required>
+                            <div class="autocomplete-wrapper edu-col-3">
+                                <input type="text" class="edu-school" placeholder="ชื่อสถาบัน" required autocomplete="off">
+                            </div>
+                            <button type="button" class="remove-btn" onclick="removeItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" data-target="list-education" data-type="edu"><span class="plus-icon">+</span> เพิ่มประวัติการศึกษา</button>
+                </div>
+
+                <div class="input-group">
+                    <label>2. ความชอบและสิ่งที่สนใจ (บังคับ)</label>
+                    <div class="dynamic-list" id="list-interests">
+                        <div class="dynamic-item">
+                            <input type="text" placeholder="เช่น ชอบออกแบบ, ชอบตัวเลข, ชอบเล่นเกม" required>
+                            <button type="button" class="remove-btn" onclick="removeItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" data-target="list-interests" data-placeholder="เพิ่มความชอบ..."><span class="plus-icon">+</span> เพิ่มความชอบ</button>
+                </div>
+
+                <div class="input-group">
+                    <label>3. ทักษะวิชาชีพ / Hard Skills (บังคับ)</label>
+                    <div class="dynamic-list" id="list-hard-skills">
+                        <div class="dynamic-item">
+                            <input type="text" placeholder="เช่น เขียนโปรแกรม Python, ใช้ Excel ขั้นสูง, ขับรถยนต์" required>
+                            <button type="button" class="remove-btn" onclick="removeItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" data-target="list-hard-skills" data-placeholder="เพิ่ม Hard Skill..."><span class="plus-icon">+</span> เพิ่ม Hard Skill</button>
+                </div>
+
+                <div class="input-group">
+                    <label>4. ทักษะทางสังคม / Soft Skills (บังคับ)</label>
+                    <div class="dynamic-list" id="list-soft-skills">
+                        <div class="dynamic-item">
+                            <input type="text" placeholder="เช่น ทำงานเป็นทีมได้ดี, สื่อสารเก่ง, แก้ปัญหาเฉพาะหน้า" required>
+                            <button type="button" class="remove-btn" onclick="removeItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" data-target="list-soft-skills" data-placeholder="เพิ่ม Soft Skill..."><span class="plus-icon">+</span> เพิ่ม Soft Skill</button>
+                </div>
+
+                <div class="input-group">
+                    <label>5. ประสบการณ์ (บังคับ)</label>
+                    <div class="dynamic-list" id="list-experience">
+                        <div class="dynamic-item">
+                            <input type="text" placeholder="เช่น เคยเป็นประธานสี, ขายของออนไลน์, ฝึกงานบริษัท X" required>
+                            <button type="button" class="remove-btn" onclick="removeItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" data-target="list-experience" data-placeholder="เพิ่มประสบการณ์..."><span class="plus-icon">+</span> เพิ่มประสบการณ์</button>
+                </div>
+
+                <div class="input-group" style="margin-top: 15px;">
+                    <label>6. เป้าหมายรายได้ต่อเดือน (บาท)</label>
+                    <input type="text" id="user-income" class="large-input" placeholder="เช่น 15000 หรือ 15000-20000" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="manage-profile-btn" class="save-btn">💾 จัดการโปรไฟล์ (Save / Load)</button>
+                    <button type="button" id="clear-data-btn" class="clear-btn">🗑️ ล้างหน้าจอ</button>
+                </div>
+                
+                <button type="submit" id="analyze-btn" style="margin-top: 5px;">วิเคราะห์อาชีพ & สร้าง Resume</button>
+            </form>
+        </main>
+    </div>
+
+    <!-- หน้าต่างจัดการโปรไฟล์ (Save/Load) -->
+    <div id="profile-modal" class="overlay hidden">
+        <div class="crop-content" style="max-width: 450px;">
+            <h3 style="margin-bottom: 15px; color: var(--text-main); font-size: 20px;">📂 จัดการโปรไฟล์ของคุณ</h3>
+            
+            <!-- รายชื่อเซฟที่มีอยู่ -->
+            <div id="saved-profiles-list" class="saved-profiles-container">
+                <!-- โค้ดสร้างรายชื่อเซฟจะถูกแทรกตรงนี้ด้วย JS -->
+            </div>
+
+            <div class="save-new-profile-box">
+                <input type="text" id="new-profile-name" placeholder="ตั้งชื่อเซฟใหม่..." style="flex: 1; padding: 10px;">
+                <button type="button" id="btn-save-new" class="btn-save-action"><span style="font-size: 16px; margin-right: 4px;">+</span> บันทึก</button>
+            </div>
+            
+            <button type="button" id="close-profile-modal" style="margin-top: 15px; width: 100%; background: #F3F4F6; color: #4B5563; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">ปิดหน้าต่าง</button>
+        </div>
+    </div>
+
+    <div id="crop-modal" class="overlay hidden">
+        <div class="crop-content">
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">ปรับขนาดรูปถ่าย (1.5 นิ้ว)</h3>
+            <div class="crop-container">
+                <img id="crop-image" src="" alt="ภาพสำหรับตัด">
+            </div>
+            <div class="crop-actions">
+                <button type="button" id="cancel-crop-btn" style="background: #EF4444;">ยกเลิก</button>
+                <button type="button" id="save-crop-btn" style="background: var(--primary-color);">ยืนยันการตัดรูป</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="overlay hidden">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <p id="loading-text">กำลังทำงาน...</p>
+        </div>
+    </div>
+
+    <div id="result-modal" class="overlay hidden">
+        <div class="result-content">
+            <button id="close-btn">&times;</button>
+            
+            <div class="tab-container">
+                <button class="tab-btn active" id="tab-career">ผลการวิเคราะห์อาชีพ</button>
+                <button class="tab-btn" id="tab-resume">ดู Resume ของคุณ</button>
+            </div>
+            
+            <div id="content-career" class="tab-content active">
+                <div class="cards-layout" id="cards-container"></div>
+                <div class="summary-box" id="summary-container"></div>
+            </div>
+
+            <div id="content-resume" class="tab-content hidden">
+                <button id="download-pdf-btn" class="secondary-btn" style="margin-bottom: 20px; width: auto; padding: 10px 20px;">📥 ดาวน์โหลดเป็น PDF</button>
+                <div class="resume-wrapper">
+                    <div id="resume-document" class="resume-paper"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
