@@ -524,14 +524,24 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
     }
 
     document.getElementById("loading-overlay").classList.remove("hidden");
-    document.getElementById("loading-text").innerText = "กำลังวิเคราะห์ไฟล์...";
+    
+    // --- เริ่มส่วนลูกเล่นข้อความโหลด ---
+    let importMsgIndex = 0;
+    const importLoadingMsgs = ["กำลังอ่านไฟล์ PDF...", "กำลังสกัดข้อความ...", "AI กำลังจัดเรียงข้อมูล...", "เตรียมนำข้อมูลลงฟอร์ม..."];
+    document.getElementById("loading-text").innerText = importLoadingMsgs[0];
+    const importInterval = setInterval(() => {
+        importMsgIndex++;
+        if (importMsgIndex < importLoadingMsgs.length) {
+            document.getElementById("loading-text").innerText = importLoadingMsgs[importMsgIndex];
+        }
+    }, 2000);
+    // --- จบส่วนลูกเล่นข้อความโหลด ---
 
     try {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         let extractedText = "";
 
-        // 1. พยายามดึงข้อความแบบปกติก่อน
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
@@ -541,7 +551,6 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
 
         let requestPayload = {};
 
-        // 2. ถ้าข้อความน้อยเกินไป ถือว่าเป็น PDF รูปภาพ ให้แปลงหน้าแรกเป็นภาพส่งไปแทน
         if (extractedText.trim().length < 50) {
             document.getElementById("loading-text").innerText = "ตรวจพบ PDF รูปภาพ กำลังให้ AI สแกนภาพ...";
             
@@ -554,15 +563,12 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
             canvas.height = viewport.height;
             await page.render({ canvasContext: ctx, viewport: viewport }).promise;
             
-            // แปลง Canvas เป็น Base64
             const base64Img = canvas.toDataURL("image/jpeg", 0.8).split(",")[1];
             requestPayload = { imageBase64: base64Img };
         } else {
-            document.getElementById("loading-text").innerText = "กำลังจัดเรียงข้อมูลลงแบบฟอร์ม...";
             requestPayload = { textData: extractedText };
         }
 
-        // 3. ส่งข้อมูลไปที่ Vercel API
         const response = await fetch('/api/parse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -578,7 +584,6 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
         
         const parsedData = JSON.parse(jsonText);
 
-        // 4. นำข้อมูลมาหยอดลงช่องฟอร์ม
         if(parsedData.name) document.getElementById('user-name').value = parsedData.name;
         if(parsedData.summary) document.getElementById('user-summary').value = parsedData.summary;
         if(parsedData.phone) document.getElementById('user-phone').value = parsedData.phone;
@@ -619,12 +624,13 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
         fillDynamicList('list-soft-skills', parsedData.softSkills);
         fillDynamicList('list-experience', parsedData.experience);
 
-        document.getElementById("loading-overlay").classList.add("hidden");
         alert("ดึงข้อมูลสำเร็จ! ลองตรวจสอบและแก้ไขให้สมบูรณ์อีกครั้งนะครับ");
         fileInput.value = '';
 
     } catch (error) {
-        document.getElementById("loading-overlay").classList.add("hidden");
         alert("เกิดข้อผิดพลาด: " + error.message);
+    } finally {
+        clearInterval(importInterval);
+        document.getElementById("loading-overlay").classList.add("hidden");
     }
 });
