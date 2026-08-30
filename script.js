@@ -1,10 +1,42 @@
-
 const degrees = ["มัธยมศึกษาปีที่ 3 (ม.3)", "มัธยมศึกษาปีที่ 6 (ม.6)", "ประกาศนียบัตรวิชาชีพ (ปวช.)", "ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)", "ปริญญาตรี", "ปริญญาโท", "ปริญญาเอก"];
 const institutions = [
     "จุฬาลงกรณ์มหาวิทยาลัย", "มหาวิทยาลัยธรรมศาสตร์", "มหาวิทยาลัยมหิดล", "มหาวิทยาลัยเกษตรศาสตร์", "มหาวิทยาลัยเชียงใหม่", "มหาวิทยาลัยขอนแก่น", "มหาวิทยาลัยสงขลานครินทร์", "มหาวิทยาลัยศิลปากร", "มหาวิทยาลัยศรีนครินทรวิโรฒ", "มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี", "มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ", "สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง", "มหาวิทยาลัยบูรพา", "มหาวิทยาลัยรามคำแหง", "มหาวิทยาลัยแม่ฟ้าหลวง", "มหาวิทยาลัยราชภัฏสวนสุนันทา", "มหาวิทยาลัยกรุงเทพ", "มหาวิทยาลัยรังสิต", "มหาวิทยาลัยหอการค้าไทย",
     "วิทยาลัยเทคนิคเชียงใหม่", "วิทยาลัยเทคนิคดอนเมือง", "วิทยาลัยเทคนิคมีนบุรี", "วิทยาลัยอาชีวศึกษาเสาวภา", "วิทยาลัยอาชีวศึกษาธนบุรี", "วิทยาลัยพณิชยการเชตุพน", "วิทยาลัยพณิชยการบางนา",
     "โรงเรียนเตรียมอุดมศึกษา", "โรงเรียนสวนกุหลาบวิทยาลัย", "โรงเรียนสามเสนวิทยาลัย", "โรงเรียนสตรีวิทยา", "โรงเรียนบดินทรเดชา (สิงห์ สิงหเสนี)", "โรงเรียนเทพศิรินทร์", "โรงเรียนมหิดลวิทยานุสรณ์"
 ];
+
+// ฟังก์ชันแจ้งเตือน Custom Modal แบบ Promise
+function showCustomConfirm(message, isAlert = false, title = "แจ้งเตือน", icon = "⚠️") {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('custom-alert-modal');
+        const msgEl = document.getElementById('custom-alert-message');
+        const titleEl = document.getElementById('custom-alert-title');
+        const iconEl = document.getElementById('custom-alert-icon');
+        const cancelBtn = document.getElementById('custom-alert-cancel');
+        const confirmBtn = document.getElementById('custom-alert-confirm');
+
+        msgEl.innerText = message;
+        titleEl.innerText = title;
+        iconEl.innerText = icon;
+        modal.classList.remove('hidden');
+
+        cancelBtn.style.display = isAlert ? 'none' : 'block';
+        confirmBtn.style.background = isAlert ? 'var(--primary-color)' : '#EF4444';
+        confirmBtn.innerText = 'ตกลง';
+
+        const handleConfirm = () => { cleanup(); resolve(true); };
+        const handleCancel = () => { cleanup(); resolve(false); };
+
+        const cleanup = () => {
+            modal.classList.add('hidden');
+            confirmBtn.removeEventListener('click', handleConfirm);
+            cancelBtn.removeEventListener('click', handleCancel);
+        };
+
+        confirmBtn.addEventListener('click', handleConfirm);
+        cancelBtn.addEventListener('click', handleCancel);
+    });
+}
 
 function autocomplete(inp, arr) {
     let currentFocus;
@@ -51,9 +83,6 @@ function autocomplete(inp, arr) {
 document.querySelectorAll('.edu-degree').forEach(el => autocomplete(el, degrees));
 document.querySelectorAll('.edu-school').forEach(el => autocomplete(el, institutions));
 
-// ----------------------------------------------------
-// ระบบจัดการโปรไฟล์ (หลายช่องเซฟ)
-// ----------------------------------------------------
 let profileImageBase64 = "";
 
 function getSavedProfiles() {
@@ -114,7 +143,6 @@ function renderProfileList() {
     });
 }
 
-// ผูกเข้ากับ object window เพื่อให้ onclick ใน HTML เรียกได้
 window.loadProfile = function(index) {
     const profiles = getSavedProfiles();
     const data = profiles[index].data;
@@ -137,7 +165,6 @@ window.loadProfile = function(index) {
         const list = document.getElementById(listId);
         list.innerHTML = ''; 
         if (!arr || arr.length === 0) {
-            // ถ้าว่างเปล่า ให้สร้างช่องว่างไว้อย่างน้อย 1 ช่อง
             if(type === 'edu') document.querySelector(`button[data-target="${listId}"]`).click();
             return;
         }
@@ -180,8 +207,9 @@ window.loadProfile = function(index) {
     document.getElementById("profile-modal").classList.add("hidden");
 };
 
-window.deleteProfile = function(index) {
-    if(confirm("ลบโปรไฟล์นี้ทิ้งใช่หรือไม่?")) {
+window.deleteProfile = async function(index) {
+    const isConfirm = await showCustomConfirm("ลบโปรไฟล์นี้ทิ้งใช่หรือไม่?");
+    if(isConfirm) {
         const profiles = getSavedProfiles();
         profiles.splice(index, 1);
         saveProfilesList(profiles);
@@ -189,7 +217,6 @@ window.deleteProfile = function(index) {
     }
 };
 
-// ปุ่มเปิดหน้าต่างและบันทึก
 document.getElementById('manage-profile-btn').addEventListener('click', () => {
     renderProfileList();
     document.getElementById('profile-modal').classList.remove('hidden');
@@ -199,10 +226,10 @@ document.getElementById('close-profile-modal').addEventListener('click', () => {
     document.getElementById('profile-modal').classList.add('hidden');
 });
 
-document.getElementById('btn-save-new').addEventListener('click', () => {
+document.getElementById('btn-save-new').addEventListener('click', async () => {
     const saveName = document.getElementById('new-profile-name').value.trim();
     if (!saveName) {
-        alert("กรุณาตั้งชื่อให้โปรไฟล์ก่อนบันทึก");
+        await showCustomConfirm("กรุณาตั้งชื่อให้โปรไฟล์ก่อนบันทึก", true);
         return;
     }
     
@@ -216,16 +243,13 @@ document.getElementById('btn-save-new').addEventListener('click', () => {
     renderProfileList();
 });
 
-document.getElementById('clear-data-btn').addEventListener('click', () => {
-    if(confirm('ต้องการล้างข้อมูลที่กรอกไว้ทั้งหมดใช่หรือไม่? (ไม่มีผลกับโปรไฟล์ที่เซฟไว้แล้ว)')) {
+document.getElementById('clear-data-btn').addEventListener('click', async () => {
+    const isConfirm = await showCustomConfirm('ต้องการล้างข้อมูลที่กรอกไว้ทั้งหมดใช่หรือไม่?\n(ไม่มีผลกับโปรไฟล์ที่เซฟไว้แล้ว)');
+    if(isConfirm) {
         location.reload();
     }
 });
 
-
-// ----------------------------------------------------
-// ระบบครอปรูปภาพ 1.5 นิ้ว
-// ----------------------------------------------------
 let cropper = null;
 
 document.getElementById('user-image').addEventListener('change', function(e) {
@@ -278,13 +302,13 @@ document.getElementById("toggle-personal-info").addEventListener("click", () => 
     document.getElementById("toggle-icon").innerText = document.getElementById("personal-info-section").classList.contains("hidden") ? "+" : "-";
 });
 
-window.removeItem = function(btn) {
+window.removeItem = async function(btn) {
     const item = btn.parentElement;
     const list = item.parentElement;
     if (list.querySelectorAll('.dynamic-item').length > 1) {
         item.remove();
     } else {
-        alert("ข้อมูลส่วนนี้เป็นข้อมูลบังคับ กรุณากรอกไว้อย่างน้อย 1 รายการ");
+        await showCustomConfirm("ข้อมูลส่วนนี้เป็นข้อมูลบังคับ กรุณากรอกไว้อย่างน้อย 1 รายการ", true);
     }
 };
 
@@ -365,7 +389,8 @@ document.getElementById("pathfinderForm").addEventListener("submit", async funct
     const expValues = getListValues("list-experience");
     
     if(eduValues.length === 0 || intValues.length === 0 || hardSkillValues.length === 0 || softSkillValues.length === 0 || expValues.length === 0) {
-        alert("กรุณากรอกข้อมูลในหัวข้อที่ 1-5 อย่างน้อยหัวข้อละ 1 รายการ"); return;
+        await showCustomConfirm("กรุณากรอกข้อมูลในหัวข้อที่ 1-5 อย่างน้อยหัวข้อละ 1 รายการ", true); 
+        return;
     }
 
     const name = document.getElementById("user-name").value.trim() || "ชื่อ นามสกุล";
@@ -491,7 +516,7 @@ document.getElementById("pathfinderForm").addEventListener("submit", async funct
         tabs.careerBtn.click(); 
 
     } catch (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
+        await showCustomConfirm("เกิดข้อผิดพลาด: " + error.message, true, "แจ้งเตือนข้อผิดพลาด", "❌");
         document.getElementById("loading-overlay").classList.add("hidden");
     } finally {
         clearInterval(textInterval);
@@ -502,11 +527,6 @@ document.getElementById("download-pdf-btn").addEventListener("click", () => {
     window.print();
 });
 
-
-
-// ----------------------------------------------------
-// ระบบ Smart Import (รองรับทั้ง Text PDF และ Image PDF)
-// ----------------------------------------------------
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
 document.getElementById('btn-smart-import').addEventListener('click', async () => {
@@ -514,18 +534,17 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
     const file = fileInput.files[0];
     
     if (!file) {
-        alert("กรุณาเลือกไฟล์ Resume ก่อนครับ");
+        await showCustomConfirm("กรุณาเลือกไฟล์ Resume ก่อน", true);
         return;
     }
 
     if (file.type !== "application/pdf") {
-        alert("รองรับเฉพาะไฟล์ PDF เท่านั้นครับ");
+        await showCustomConfirm("รองรับเฉพาะไฟล์ PDF เท่านั้น", true);
         return;
     }
 
     document.getElementById("loading-overlay").classList.remove("hidden");
     
-    // --- เริ่มส่วนลูกเล่นข้อความโหลด ---
     let importMsgIndex = 0;
     const importLoadingMsgs = ["กำลังอ่านไฟล์ PDF...", "กำลังสกัดข้อความ...", "AI กำลังจัดเรียงข้อมูล...", "เตรียมนำข้อมูลลงฟอร์ม..."];
     document.getElementById("loading-text").innerText = importLoadingMsgs[0];
@@ -535,7 +554,6 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
             document.getElementById("loading-text").innerText = importLoadingMsgs[importMsgIndex];
         }
     }, 2000);
-    // --- จบส่วนลูกเล่นข้อความโหลด ---
 
     try {
         const arrayBuffer = await file.arrayBuffer();
@@ -624,11 +642,11 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
         fillDynamicList('list-soft-skills', parsedData.softSkills);
         fillDynamicList('list-experience', parsedData.experience);
 
-        alert("ดึงข้อมูลสำเร็จ! ลองตรวจสอบและแก้ไขให้สมบูรณ์อีกครั้งนะครับ");
+        await showCustomConfirm("ดึงข้อมูลสำเร็จ! ลองตรวจสอบและแก้ไขให้สมบูรณ์อีกครั้งนะครับ", true, "สำเร็จ", "✅");
         fileInput.value = '';
 
     } catch (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
+        await showCustomConfirm("เกิดข้อผิดพลาด: " + error.message, true, "แจ้งเตือนข้อผิดพลาด", "❌");
     } finally {
         clearInterval(importInterval);
         document.getElementById("loading-overlay").classList.add("hidden");
