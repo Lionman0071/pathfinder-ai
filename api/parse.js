@@ -9,10 +9,12 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { base64Data, mimeType } = req.body;
+        // รับข้อความที่หน้าเว็บแกะมาให้แล้ว
+        const { textData } = req.body;
 
         const aiPrompt = `
-        คุณคือผู้เชี่ยวชาญด้านทรัพยากรบุคคล จงอ่านข้อมูลจากไฟล์ Resume นี้ และสกัดข้อมูลออกมาให้อยู่ในรูปแบบ JSON โครงสร้างด้านล่างนี้เท่านั้น (หากไม่มีข้อมูลส่วนไหนให้ปล่อยว่างเป็น ""):
+        คุณคือผู้เชี่ยวชาญด้านทรัพยากรบุคคล จงอ่านข้อความที่สกัดมาจากไฟล์ Resume นี้ 
+        และจัดกลุ่มข้อมูลออกมาให้อยู่ในรูปแบบ JSON โครงสร้างนี้เท่านั้น (หากไม่มีข้อมูลส่วนไหนให้ปล่อยว่างเป็น ""):
         {
             "name": "ชื่อ-นามสกุล",
             "summary": "สรุปประวัติการทำงานแบบย่อ",
@@ -25,7 +27,11 @@ export default async function handler(req, res) {
             "hardSkills": ["ทักษะที่ 1", "ทักษะที่ 2"],
             "softSkills": ["ทักษะที่ 1", "ทักษะที่ 2"],
             "experience": ["ประสบการณ์ที่ 1", "ประสบการณ์ที่ 2"]
-        }`;
+        }
+
+        ข้อความจาก Resume ผู้ใช้:
+        ${textData}
+        `;
 
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
@@ -34,12 +40,10 @@ export default async function handler(req, res) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{
-                        parts: [
-                            { text: aiPrompt },
-                            { inlineData: { mimeType: mimeType, data: base64Data } }
-                        ]
+                        parts: [{ text: aiPrompt }]
                     }],
-                    generationConfig: { responseMimeType: "application/json" }
+                    // บังคับให้ AI ตอบกลับเป็น JSON เท่านั้น ลดปัญหาข้อมูลขยะ
+                    generationConfig: { responseMimeType: "application/json" } 
                 })
             }
         );
@@ -47,6 +51,6 @@ export default async function handler(req, res) {
         const data = await response.json();
         res.status(200).json(data);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to parse resume via Gemini API' });
+        res.status(500).json({ error: 'Failed to parse resume text' });
     }
 }
