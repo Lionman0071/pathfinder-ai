@@ -505,9 +505,8 @@ document.getElementById("download-pdf-btn").addEventListener("click", () => {
 
 
 // ----------------------------------------------------
-// ระบบ Smart Import (สกัดข้อความจาก PDF ด้วย pdf.js)
+// ระบบ Smart Import (รองรับทั้ง Text PDF และ Image PDF)
 // ----------------------------------------------------
-// ตั้งค่า Worker ให้ pdf.js ทำงาน
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
 document.getElementById('btn-smart-import').addEventListener('click', async () => {
@@ -515,24 +514,24 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
     const file = fileInput.files[0];
     
     if (!file) {
-        alert("กรุณาเลือกไฟล์ Resume ก่อน");
+        alert("กรุณาเลือกไฟล์ Resume ก่อนครับ");
         return;
     }
 
     if (file.type !== "application/pdf") {
-        alert("รองรับเฉพาะไฟล์ PDF เท่านั้น");
+        alert("รองรับเฉพาะไฟล์ PDF เท่านั้นครับ");
         return;
     }
 
     document.getElementById("loading-overlay").classList.remove("hidden");
-    document.getElementById("loading-text").innerText = "กำลังสกัดข้อความจากไฟล์...";
+    document.getElementById("loading-text").innerText = "กำลังวิเคราะห์ไฟล์...";
 
     try {
-        // 1. อ่านไฟล์และแกะตัวอักษรด้วย pdf.js
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         let extractedText = "";
 
+        // 1. พยายามดึงข้อความแบบปกติก่อน
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
@@ -540,29 +539,46 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
             extractedText += pageText + "\n";
         }
 
-        if (!extractedText.trim()) {
-            throw new Error("ไม่พบข้อความในไฟล์ PDF หรือไฟล์อาจเป็นรูปภาพที่แปลงมาเป็น PDF");
+        let requestPayload = {};
+
+        // 2. ถ้าข้อความน้อยเกินไป ถือว่าเป็น PDF รูปภาพ ให้แปลงหน้าแรกเป็นภาพส่งไปแทน
+        if (extractedText.trim().length < 50) {
+            document.getElementById("loading-text").innerText = "ตรวจพบ PDF รูปภาพ กำลังให้ AI สแกนภาพ...";
+            
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+            
+            // แปลง Canvas เป็น Base64
+            const base64Img = canvas.toDataURL("image/jpeg", 0.8).split(",")[1];
+            requestPayload = { imageBase64: base64Img };
+        } else {
+            document.getElementById("loading-text").innerText = "กำลังจัดเรียงข้อมูลลงแบบฟอร์ม...";
+            requestPayload = { textData: extractedText };
         }
 
-        // 2. ส่งข้อความไปให้ AI จัดโครงสร้าง
-        document.getElementById("loading-text").innerText = "กำลังจัดเรียงข้อมูลลงแบบฟอร์ม...";
-        
+        // 3. ส่งข้อมูลไปที่ Vercel API
         const response = await fetch('/api/parse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ textData: extractedText })
+            body: JSON.stringify(requestPayload)
         });
 
-        if (!response.ok) throw new Error("ไม่สามารถเชื่อมต่อ API หรือใช้เวลาทำงานนานเกินไป");
+        if (!response.ok) throw new Error("ไม่สามารถเชื่อมต่อระบบวิเคราะห์ได้");
         
         const data = await response.json();
         const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
         
-        if (!jsonText) throw new Error("ไม่สามารถวิเคราะห์ข้อมูลได้");
+        if (!jsonText) throw new Error("วิเคราะห์ข้อมูลไม่สำเร็จ");
         
         const parsedData = JSON.parse(jsonText);
 
-        // 3. หยอดข้อมูลทั่วไป
+        // 4. นำข้อมูลมาหยอดลงช่องฟอร์ม
         if(parsedData.name) document.getElementById('user-name').value = parsedData.name;
         if(parsedData.summary) document.getElementById('user-summary').value = parsedData.summary;
         if(parsedData.phone) document.getElementById('user-phone').value = parsedData.phone;
@@ -573,16 +589,13 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
             document.getElementById("toggle-personal-info").click();
         }
 
-        // ฟังก์ชันช่วยหยอดข้อมูลลงลิสต์
         const fillDynamicList = (listId, items, type) => {
             if(!items || items.length === 0) return;
             const list = document.getElementById(listId);
             list.innerHTML = ''; 
-            
             items.forEach(val => {
                 const newItem = document.createElement('div');
                 newItem.className = 'dynamic-item';
-                
                 if (type === 'edu') {
                     newItem.classList.add('edu-item');
                     newItem.innerHTML = `
@@ -607,7 +620,7 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
         fillDynamicList('list-experience', parsedData.experience);
 
         document.getElementById("loading-overlay").classList.add("hidden");
-        alert("ดึงข้อมูลสำเร็จ! กรุณาตรวจสอบความถูกต้องอีกครั้ง");
+        alert("ดึงข้อมูลสำเร็จ! ลองตรวจสอบและแก้ไขให้สมบูรณ์อีกครั้งนะครับ");
         fileInput.value = '';
 
     } catch (error) {
