@@ -8,6 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <!-- เพิ่มสคริปต์ pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <link rel="icon" type="image/png" href="img/logo.png">
 </head>
 <body>
@@ -32,16 +34,16 @@
                 
                 <!-- ส่วนของ Smart Import -->
                 <div class="smart-import-box">
-                    <label class="smart-import-label">✨ Smart Import (ให้ AI ช่วยกรอกข้อมูลจาก Resume ของคุณ)</label>
+                    <label class="smart-import-label">✨ Smart Import</label>
                     <div class="smart-import-inputs">
-                        <input type="file" id="import-resume-file" accept="application/pdf, image/jpeg, image/png">
+                        <input type="file" id="import-resume-file" accept="application/pdf">
                         <button type="button" id="btn-smart-import" class="secondary-btn">ดึงข้อมูล</button>
                     </div>
-                    <small class="smart-import-note">* รองรับไฟล์ PDF, JPG, PNG (ไม่รองรับการดึงรูปถ่าย กรุณาอัปโหลดรูปแยกต่างหาก)</small>
+                    <small class="smart-import-note">* รองรับเฉพาะไฟล์ PDF เท่านั้น</small>
                 </div>
                 
                 <button type="button" id="toggle-personal-info" class="toggle-btn">
-                    <span id="toggle-icon" class="plus-icon">+</span> เพิ่มข้อมูลส่วนตัว (ลงใน Resume / ข้ามได้)
+                    <span id="toggle-icon" class="plus-icon">+</span> เพิ่มข้อมูลส่วนตัว
                 </button>
                 
                 <div id="personal-info-section" class="personal-info-box hidden">
@@ -50,7 +52,7 @@
                         <input type="file" id="user-image" accept="image/*" hidden>
                         <label for="user-image" class="image-upload-box" id="image-preview-label">
                             <div class="upload-icon">📷</div>
-                            <div class="upload-text">อัปโหลดรูปถ่าย<br>(1.5 นิ้ว)</div>
+                            <div class="upload-text">อัปโหลดรูปถ่าย</div>
                         </label>
                     </div>
 
@@ -59,7 +61,7 @@
                         <input type="text" id="user-name" placeholder="เช่น สมชาย ใจดี">
                     </div>
                     <div class="input-group">
-                        <label>อธิบายเกี่ยวกับตัวคุณ (Profile Summary)</label>
+                        <label>อธิบายเกี่ยวกับตัวคุณ</label>
                         <textarea id="user-summary" rows="3" placeholder="เช่น เป็นคนชอบเรียนรู้เทคโนโลยีใหม่ๆ มุ่งมั่นพัฒนาตัวเอง..."></textarea>
                     </div>
                     
@@ -86,17 +88,17 @@
                     </div>
                     <div class="input-row">
                         <div class="input-group">
-                            <label>ลิงก์ผลงาน (LinkedIn / GitHub)</label>
+                            <label>ลิงก์ผลงาน</label>
                             <input type="text" id="user-portfolio" placeholder="เช่น linkedin.com/in/username">
                         </div>
                         <div class="input-group">
-                            <label>ที่อยู่ (ย่อ)</label>
+                            <label>ที่อยู่</label>
                             <input type="text" id="user-address" placeholder="เช่น กรุงเทพมหานคร">
                         </div>
                     </div>
 
                     <div class="input-group">
-                        <label>งานอดิเรก (Hobbies)</label>
+                        <label>งานอดิเรก</label>
                         <input type="text" id="user-hobby" placeholder="เช่น อ่านหนังสือ, ถ่ายภาพ, เล่นดนตรี, ปั่นจักรยาน">
                     </div>
                 </div>
@@ -104,7 +106,7 @@
                 <hr class="divider">
 
                 <div class="input-group">
-                    <label>1. ระดับการศึกษา (บังคับ)</label>
+                    <label>1. ระดับการศึกษา</label>
                     <div class="dynamic-list" id="list-education">
                         <div class="dynamic-item edu-item">
                             <div class="autocomplete-wrapper edu-col-1">
@@ -121,7 +123,7 @@
                 </div>
 
                 <div class="input-group">
-                    <label>2. ความชอบและสิ่งที่สนใจ (บังคับ)</label>
+                    <label>2. ความชอบและสิ่งที่สนใจ</label>
                     <div class="dynamic-list" id="list-interests">
                         <div class="dynamic-item">
                             <input type="text" placeholder="เช่น ชอบออกแบบ, ชอบตัวเลข, ชอบเล่นเกม" required>
@@ -132,7 +134,7 @@
                 </div>
 
                 <div class="input-group">
-                    <label>3. ทักษะวิชาชีพ / Hard Skills (บังคับ)</label>
+                    <label>3. ทักษะวิชาชีพ</label>
                     <div class="dynamic-list" id="list-hard-skills">
                         <div class="dynamic-item">
                             <input type="text" placeholder="เช่น เขียนโปรแกรม Python, ใช้ Excel ขั้นสูง, ขับรถยนต์" required>
@@ -143,7 +145,7 @@
                 </div>
 
                 <div class="input-group">
-                    <label>4. ทักษะทางสังคม / Soft Skills (บังคับ)</label>
+                    <label>4. ทักษะทางสังคม</label>
                     <div class="dynamic-list" id="list-soft-skills">
                         <div class="dynamic-item">
                             <input type="text" placeholder="เช่น ทำงานเป็นทีมได้ดี, สื่อสารเก่ง, แก้ปัญหาเฉพาะหน้า" required>
@@ -154,7 +156,7 @@
                 </div>
 
                 <div class="input-group">
-                    <label>5. ประสบการณ์ (บังคับ)</label>
+                    <label>5. ประสบการณ์</label>
                     <div class="dynamic-list" id="list-experience">
                         <div class="dynamic-item">
                             <input type="text" placeholder="เช่น เคยเป็นประธานสี, ขายของออนไลน์, ฝึกงานบริษัท X" required>
@@ -165,12 +167,12 @@
                 </div>
 
                 <div class="input-group" style="margin-top: 15px;">
-                    <label>6. เป้าหมายรายได้ต่อเดือน (บาท)</label>
+                    <label>6. เป้าหมายรายได้ต่อเดือน</label>
                     <input type="text" id="user-income" class="large-input" placeholder="เช่น 15000 หรือ 15000-20000" required>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" id="manage-profile-btn" class="save-btn">💾 จัดการโปรไฟล์ (Save / Load)</button>
+                    <button type="button" id="manage-profile-btn" class="save-btn">💾 จัดการโปรไฟล์</button>
                     <button type="button" id="clear-data-btn" class="clear-btn">🗑️ ล้างหน้าจอ</button>
                 </div>
                 
@@ -179,7 +181,6 @@
         </main>
     </div>
 
-    <!-- หน้าต่างจัดการโปรไฟล์ (Save/Load) -->
     <div id="profile-modal" class="overlay hidden">
         <div class="crop-content" style="max-width: 450px;">
             <h3 style="margin-bottom: 15px; color: var(--text-main); font-size: 20px;">📂 จัดการโปรไฟล์ของคุณ</h3>
@@ -198,7 +199,7 @@
 
     <div id="crop-modal" class="overlay hidden">
         <div class="crop-content">
-            <h3 style="margin-bottom: 15px; color: var(--primary-color);">ปรับขนาดรูปถ่าย (1.5 นิ้ว)</h3>
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">ปรับขนาดรูปถ่าย</h3>
             <div class="crop-container">
                 <img id="crop-image" src="" alt="ภาพสำหรับตัด">
             </div>
