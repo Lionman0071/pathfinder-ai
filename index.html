@@ -210,10 +210,12 @@
         </div>
     </div>
 
-    <!-- ส่วนที่เพิ่มใหม่: หน้าต่างแจ้งเตือน Custom Modal -->
+    <!-- หน้าต่างแจ้งเตือน Custom Modal แบบอนิเมชัน -->
     <div id="custom-alert-modal" class="overlay hidden">
         <div class="crop-content" style="max-width: 400px; text-align: center;">
-            <div id="custom-alert-icon" style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+            <div id="custom-alert-icon-container" style="margin-bottom: 12px; display: flex; justify-content: center;">
+                <!-- ไอคอนจะถูกเปลี่ยนด้วย JS -->
+            </div>
             <h3 id="custom-alert-title" style="margin-bottom: 10px; color: var(--text-main); font-size: 18px;">แจ้งเตือน</h3>
             <p id="custom-alert-message" style="color: #4B5563; font-size: 14px; margin-bottom: 20px; line-height: 1.5;"></p>
             <div class="crop-actions">

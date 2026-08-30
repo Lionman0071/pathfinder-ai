@@ -5,20 +5,35 @@ const institutions = [
     "โรงเรียนเตรียมอุดมศึกษา", "โรงเรียนสวนกุหลาบวิทยาลัย", "โรงเรียนสามเสนวิทยาลัย", "โรงเรียนสตรีวิทยา", "โรงเรียนบดินทรเดชา (สิงห์ สิงหเสนี)", "โรงเรียนเทพศิรินทร์", "โรงเรียนมหิดลวิทยานุสรณ์"
 ];
 
-// ฟังก์ชันแจ้งเตือน Custom Modal แบบ Promise
-function showCustomConfirm(message, isAlert = false, title = "แจ้งเตือน", icon = "⚠️") {
+// ฟังก์ชันแจ้งเตือน Custom Modal พร้อมไอคอน SVG และอนิเมชัน
+function showCustomConfirm(message, isAlert = false, title = "แจ้งเตือน", type = "warning") {
     return new Promise((resolve) => {
         const modal = document.getElementById('custom-alert-modal');
         const msgEl = document.getElementById('custom-alert-message');
         const titleEl = document.getElementById('custom-alert-title');
-        const iconEl = document.getElementById('custom-alert-icon');
+        const iconContainer = document.getElementById('custom-alert-icon-container');
         const cancelBtn = document.getElementById('custom-alert-cancel');
         const confirmBtn = document.getElementById('custom-alert-confirm');
 
         msgEl.innerText = message;
         titleEl.innerText = title;
-        iconEl.innerText = icon;
         modal.classList.remove('hidden');
+
+        // สร้างไอคอน SVG แบบเคลื่อนไหว
+        if (type === "success") {
+            iconContainer.innerHTML = `
+                <svg class="icon-success-svg" width="50" height="50" viewBox="0 0 50 50">
+                    <circle cx="25" cy="25" r="23" fill="none" stroke="#10B981" stroke-width="4"/>
+                    <path fill="none" stroke="#10B981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M14 27l7 7 16-16"/>
+                </svg>`;
+        } else {
+            iconContainer.innerHTML = `
+                <svg class="icon-alert-svg" width="50" height="50" viewBox="0 0 50 50">
+                    <circle cx="25" cy="25" r="23" fill="none" stroke="#F59E0B" stroke-width="4"/>
+                    <line x1="25" y1="13" x2="25" y2="27" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
+                    <circle cx="25" cy="35" r="2.5" fill="#F59E0B"/>
+                </svg>`;
+        }
 
         cancelBtn.style.display = isAlert ? 'none' : 'block';
         confirmBtn.style.background = isAlert ? 'var(--primary-color)' : '#EF4444';
@@ -208,7 +223,7 @@ window.loadProfile = function(index) {
 };
 
 window.deleteProfile = async function(index) {
-    const isConfirm = await showCustomConfirm("ลบโปรไฟล์นี้ทิ้งใช่หรือไม่?");
+    const isConfirm = await showCustomConfirm("ลบโปรไฟล์นี้ทิ้งใช่หรือไม่?", false, "ยืนยันการลบ", "warning");
     if(isConfirm) {
         const profiles = getSavedProfiles();
         profiles.splice(index, 1);
@@ -229,7 +244,7 @@ document.getElementById('close-profile-modal').addEventListener('click', () => {
 document.getElementById('btn-save-new').addEventListener('click', async () => {
     const saveName = document.getElementById('new-profile-name').value.trim();
     if (!saveName) {
-        await showCustomConfirm("กรุณาตั้งชื่อให้โปรไฟล์ก่อนบันทึก", true);
+        await showCustomConfirm("กรุณาตั้งชื่อให้โปรไฟล์ก่อนบันทึก", true, "แจ้งเตือน", "warning");
         return;
     }
     
@@ -244,7 +259,7 @@ document.getElementById('btn-save-new').addEventListener('click', async () => {
 });
 
 document.getElementById('clear-data-btn').addEventListener('click', async () => {
-    const isConfirm = await showCustomConfirm('ต้องการล้างข้อมูลที่กรอกไว้ทั้งหมดใช่หรือไม่?\n(ไม่มีผลกับโปรไฟล์ที่เซฟไว้แล้ว)');
+    const isConfirm = await showCustomConfirm('ต้องการล้างข้อมูลที่กรอกไว้ทั้งหมดใช่หรือไม่?\n(ไม่มีผลกับโปรไฟล์ที่เซฟไว้แล้ว)', false, "ยืนยันการล้างข้อมูล", "warning");
     if(isConfirm) {
         location.reload();
     }
@@ -308,7 +323,7 @@ window.removeItem = async function(btn) {
     if (list.querySelectorAll('.dynamic-item').length > 1) {
         item.remove();
     } else {
-        await showCustomConfirm("ข้อมูลส่วนนี้เป็นข้อมูลบังคับ กรุณากรอกไว้อย่างน้อย 1 รายการ", true);
+        await showCustomConfirm("ข้อมูลส่วนนี้เป็นข้อมูลบังคับ กรุณากรอกไว้อย่างน้อย 1 รายการ", true, "แจ้งเตือน", "warning");
     }
 };
 
@@ -389,7 +404,7 @@ document.getElementById("pathfinderForm").addEventListener("submit", async funct
     const expValues = getListValues("list-experience");
     
     if(eduValues.length === 0 || intValues.length === 0 || hardSkillValues.length === 0 || softSkillValues.length === 0 || expValues.length === 0) {
-        await showCustomConfirm("กรุณากรอกข้อมูลในหัวข้อที่ 1-5 อย่างน้อยหัวข้อละ 1 รายการ", true); 
+        await showCustomConfirm("กรุณากรอกข้อมูลในหัวข้อที่ 1-5 อย่างน้อยหัวข้อละ 1 รายการ", true, "แจ้งเตือน", "warning"); 
         return;
     }
 
@@ -511,15 +526,17 @@ document.getElementById("pathfinderForm").addEventListener("submit", async funct
         
         document.getElementById("resume-document").innerHTML = resumeFullHtml;
 
+        clearInterval(textInterval);
         document.getElementById("loading-overlay").classList.add("hidden");
+
         document.getElementById("result-modal").classList.remove("hidden");
         tabs.careerBtn.click(); 
 
     } catch (error) {
-        await showCustomConfirm("เกิดข้อผิดพลาด: " + error.message, true, "แจ้งเตือนข้อผิดพลาด", "❌");
-        document.getElementById("loading-overlay").classList.add("hidden");
-    } finally {
         clearInterval(textInterval);
+        document.getElementById("loading-overlay").classList.add("hidden");
+
+        await showCustomConfirm("เกิดข้อผิดพลาด: " + error.message, true, "แจ้งเตือนข้อผิดพลาด", "warning");
     }
 });
 
@@ -534,12 +551,12 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
     const file = fileInput.files[0];
     
     if (!file) {
-        await showCustomConfirm("กรุณาเลือกไฟล์ Resume ก่อน", true);
+        await showCustomConfirm("กรุณาเลือกไฟล์ Resume ก่อน", true, "แจ้งเตือน", "warning");
         return;
     }
 
     if (file.type !== "application/pdf") {
-        await showCustomConfirm("รองรับเฉพาะไฟล์ PDF เท่านั้น", true);
+        await showCustomConfirm("รองรับเฉพาะไฟล์ PDF เท่านั้น", true, "แจ้งเตือน", "warning");
         return;
     }
 
@@ -642,13 +659,18 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
         fillDynamicList('list-soft-skills', parsedData.softSkills);
         fillDynamicList('list-experience', parsedData.experience);
 
-        await showCustomConfirm("ดึงข้อมูลสำเร็จ! ลองตรวจสอบและแก้ไขให้สมบูรณ์อีกครั้งนะครับ", true, "สำเร็จ", "✅");
+        // ปิดหน้าโหลดก่อนแสดงผลสำเร็จ
+        clearInterval(importInterval);
+        document.getElementById("loading-overlay").classList.add("hidden");
+
+        await showCustomConfirm("ดึงข้อมูลสำเร็จ! ลองตรวจสอบและแก้ไขให้สมบูรณ์อีกครั้ง", true, "สำเร็จ", "success");
         fileInput.value = '';
 
     } catch (error) {
-        await showCustomConfirm("เกิดข้อผิดพลาด: " + error.message, true, "แจ้งเตือนข้อผิดพลาด", "❌");
-    } finally {
+        // ปิดหน้าโหลดก่อนแจ้งเตือน Error
         clearInterval(importInterval);
         document.getElementById("loading-overlay").classList.add("hidden");
+
+        await showCustomConfirm("เกิดข้อผิดพลาด: " + error.message, true, "แจ้งเตือนข้อผิดพลาด", "warning");
     }
 });
