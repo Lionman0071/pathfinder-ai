@@ -501,3 +501,98 @@ document.getElementById("pathfinderForm").addEventListener("submit", async funct
 document.getElementById("download-pdf-btn").addEventListener("click", () => {
     window.print();
 });
+
+// ----------------------------------------------------
+// ระบบ Smart Import (ให้ AI อ่านไฟล์ Resume)
+// ----------------------------------------------------
+document.getElementById('btn-smart-import').addEventListener('click', async () => {
+    const fileInput = document.getElementById('import-resume-file');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert("กรุณาเลือกไฟล์ Resume ก่อนครับ");
+        return;
+    }
+
+    document.getElementById("loading-overlay").classList.remove("hidden");
+    document.getElementById("loading-text").innerText = "กำลังให้ AI อ่านข้อมูลจากไฟล์ของคุณ...";
+
+    try {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        
+        reader.onload = async function () {
+            const base64String = reader.result.split(',')[1];
+            const mimeType = file.type;
+
+            const response = await fetch('/api/parse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ base64Data: base64String, mimeType: mimeType })
+            });
+
+            if (!response.ok) throw new Error("ไม่สามารถเชื่อมต่อ API ได้");
+            
+            const data = await response.json();
+            const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            
+            if (!jsonText) throw new Error("อ่านข้อมูลไม่สำเร็จ");
+            
+            const parsedData = JSON.parse(jsonText);
+
+            // หยอดข้อมูลทั่วไป
+            if(parsedData.name) document.getElementById('user-name').value = parsedData.name;
+            if(parsedData.summary) document.getElementById('user-summary').value = parsedData.summary;
+            if(parsedData.phone) document.getElementById('user-phone').value = parsedData.phone;
+            if(parsedData.email) document.getElementById('user-email').value = parsedData.email;
+            if(parsedData.portfolio) document.getElementById('user-portfolio').value = parsedData.portfolio;
+
+            // เปิดหน้าต่างข้อมูลส่วนตัวถ้ามันซ่อนอยู่
+            if (document.getElementById("personal-info-section").classList.contains("hidden")) {
+                document.getElementById("toggle-personal-info").click();
+            }
+
+            // ฟังก์ชันช่วยหยอดข้อมูลลงลิสต์
+            const fillDynamicList = (listId, items, type) => {
+                if(!items || items.length === 0) return;
+                const list = document.getElementById(listId);
+                list.innerHTML = ''; // ล้างของเก่า
+                
+                items.forEach(val => {
+                    const newItem = document.createElement('div');
+                    newItem.className = 'dynamic-item';
+                    
+                    if (type === 'edu') {
+                        newItem.classList.add('edu-item');
+                        newItem.innerHTML = `
+                            <div class="autocomplete-wrapper edu-col-1"><input type="text" class="edu-degree" value="${val.degree || ''}" placeholder="ระดับการศึกษา" required autocomplete="off"></div>
+                            <input type="text" class="edu-major edu-col-2" value="${val.major || ''}" placeholder="สาขาวิชา/แผนการเรียน" required>
+                            <div class="autocomplete-wrapper edu-col-3"><input type="text" class="edu-school" value="${val.school || ''}" placeholder="ชื่อสถาบัน" required autocomplete="off"></div>
+                            <button type="button" class="remove-btn" onclick="removeItem(this)">&times;</button>
+                        `;
+                        list.appendChild(newItem);
+                        autocomplete(newItem.querySelector('.edu-degree'), degrees);
+                        autocomplete(newItem.querySelector('.edu-school'), institutions);
+                    } else {
+                        newItem.innerHTML = `<input type="text" value="${val}" required><button type="button" class="remove-btn" onclick="removeItem(this)">&times;</button>`;
+                        list.appendChild(newItem);
+                    }
+                });
+            };
+
+            fillDynamicList('list-education', parsedData.education, 'edu');
+            fillDynamicList('list-hard-skills', parsedData.hardSkills);
+            fillDynamicList('list-soft-skills', parsedData.softSkills);
+            fillDynamicList('list-experience', parsedData.experience);
+
+            document.getElementById("loading-overlay").classList.add("hidden");
+            alert("ดึงข้อมูลสำเร็จ! กรุณาตรวจสอบและแก้ไขข้อมูลให้สมบูรณ์อีกครั้งครับ");
+            
+            // ล้างค่า input file
+            fileInput.value = '';
+        };
+    } catch (error) {
+        document.getElementById("loading-overlay").classList.add("hidden");
+        alert("เกิดข้อผิดพลาดในการดึงข้อมูล: " + error.message);
+    }
+});

@@ -30,6 +30,16 @@
         <main class="app-content">
             <form id="pathfinderForm" class="data-form">
                 
+                <!-- ส่วนของ Smart Import -->
+                <div class="smart-import-box">
+                    <label class="smart-import-label">✨ Smart Import (ให้ AI ช่วยกรอกข้อมูลจาก Resume ของคุณ)</label>
+                    <div class="smart-import-inputs">
+                        <input type="file" id="import-resume-file" accept="application/pdf, image/jpeg, image/png">
+                        <button type="button" id="btn-smart-import" class="secondary-btn">ดึงข้อมูล</button>
+                    </div>
+                    <small class="smart-import-note">* รองรับไฟล์ PDF, JPG, PNG (ไม่รองรับการดึงรูปถ่าย กรุณาอัปโหลดรูปแยกต่างหาก)</small>
+                </div>
+                
                 <button type="button" id="toggle-personal-info" class="toggle-btn">
                     <span id="toggle-icon" class="plus-icon">+</span> เพิ่มข้อมูลส่วนตัว (ลงใน Resume / ข้ามได้)
                 </button>
@@ -174,9 +184,7 @@
         <div class="crop-content" style="max-width: 450px;">
             <h3 style="margin-bottom: 15px; color: var(--text-main); font-size: 20px;">📂 จัดการโปรไฟล์ของคุณ</h3>
             
-            <!-- รายชื่อเซฟที่มีอยู่ -->
             <div id="saved-profiles-list" class="saved-profiles-container">
-                <!-- โค้ดสร้างรายชื่อเซฟจะถูกแทรกตรงนี้ด้วย JS -->
             </div>
 
             <div class="save-new-profile-box">

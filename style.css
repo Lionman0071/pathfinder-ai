@@ -194,3 +194,42 @@ button[type="submit"]:hover { background: var(--primary-hover); transform: trans
     .resume-contact h1 { text-align: left !important; }
     @page { size: A4 portrait; margin: 0; }
 }
+
+/* --- Smart Import Feature --- */
+.smart-import-box {
+    background: #EEF2FF;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px dashed var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.smart-import-label {
+    font-weight: 500;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.smart-import-inputs {
+    display: flex;
+    gap: 10px;
+}
+
+.smart-import-inputs input[type="file"] {
+    flex: 1;
+    padding: 8px;
+    background-color: #FFFFFF;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+}
+
+.smart-import-inputs button {
+    padding: 0 15px;
+}
+
+.smart-import-note {
+    color: #6B7280;
+    display: block;
+    margin-top: 5px;
+}
