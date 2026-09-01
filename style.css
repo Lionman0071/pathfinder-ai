@@ -183,7 +183,8 @@ button[type="submit"]:hover { background: var(--primary-hover); transform: trans
 @media print {
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     body { background: white; }
-    .app-container, .tab-container, #close-btn, #download-pdf-btn, #cards-container, #summary-container, .app-header { display: none !important; }
+    /* เพิ่มชื่อปุ่มใหม่ 2 ตัวเข้าไปในบรรทัดด้านล่างนี้ */
+    .app-container, .tab-container, #close-btn, #download-pdf-btn, #copy-text-btn, .hint-btn, #cards-container, #summary-container, .app-header { display: none !important; }
     .overlay { position: static; background: none; }
     .result-content { box-shadow: none; width: 100%; max-width: 100%; padding: 0; overflow: visible; }
     .resume-wrapper { background: none; padding: 0; }
