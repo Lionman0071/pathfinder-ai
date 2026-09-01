@@ -304,24 +304,31 @@ body.show-hints .input-group:focus-within .hint-bubble {
 
 @media print {
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    body { background: white !important; margin: 0 !important; padding: 0 !important; }
+    html, body { background: white !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
     
     /* ซ่อน UI ทั้งหมดที่ไม่ใช่กระดาษ Resume */
     .app-container, .tab-container, #close-btn, #download-pdf-btn, #copy-text-btn, .theme-selector, .hint-btn, #cards-container, #summary-container, .app-header { display: none !important; }
     
-    .overlay { position: static; background: none; }
-    .result-content { box-shadow: none; padding: 0; max-height: none; overflow: visible; width: 100%; max-width: 100%; }
-    .resume-wrapper { background: none; padding: 0; display: block; }
+    /* รีเซ็ต Padding ของกล่องครอบทุกชั้นให้เป็น 0 อย่างเด็ดขาด */
+    .overlay, .result-content, .tab-content, .resume-wrapper { 
+        position: static !important; background: transparent !important; 
+        margin: 0 !important; padding: 0 !important; border: none !important; 
+        box-shadow: none !important; width: 100% !important; max-width: 100% !important; 
+        overflow: visible !important; transform: none !important;
+    }
     
-    /* บังคับเลย์เอาต์ 2 คอลัมน์และขนาด A4 เสมอ */
+    /* บังคับขยายเต็มหน้ากระดาษ */
     .resume-paper { 
         box-shadow: none !important; margin: 0 !important; border: none !important;
-        width: 210mm !important; min-height: 297mm !important; 
+        width: 100% !important; max-width: 100% !important; min-height: 100vh !important; 
         display: grid !important; grid-template-columns: 32% 68% !important; overflow: hidden !important; 
+        background: linear-gradient(to right, #F3F4F6 0%, #F3F4F6 32%, #FFFFFF 32%, #FFFFFF 100%) !important;
     }
 
-    /* บังคับเส้นคั่นคอลัมน์ซ้ายให้กลับมา */
-    .resume-left { border-right: 1px solid #E5E7EB !important; border-bottom: none !important; padding: 35px 25px !important; }
+    .resume-left { 
+        border-right: 1px solid #E5E7EB !important; border-bottom: none !important; 
+        padding: 35px 25px !important; background-color: transparent !important;
+    }
 
     @page { size: A4 portrait; margin: 0; }
 }
