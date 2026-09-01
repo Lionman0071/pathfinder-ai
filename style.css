@@ -209,12 +209,22 @@ button[type="submit"]:hover { background: var(--primary-hover); transform: trans
     .result-content { box-shadow: none; padding: 0; max-height: none; overflow: visible; width: 100%; max-width: 100%; }
     .resume-wrapper { background: none; padding: 0; display: block; }
     
-    /* บังคับขนาด A4 ป้องกันหน้าว่างและปัญหา Spacing */
+    /* บังคับเลย์เอาต์ 2 คอลัมน์และขนาด A4 เสมอ */
     .resume-paper { 
-        box-shadow: none; margin: 0; border: none;
-        width: 210mm !important; height: 297mm !important; overflow: hidden !important; 
-        page-break-after: always;
+        box-shadow: none !important; margin: 0 !important; border: none !important;
+        width: 210mm !important; min-height: 297mm !important; 
+        display: grid !important;
+        grid-template-columns: 32% 68% !important;
+        overflow: hidden !important; 
     }
+
+    /* บังคับเส้นคั่นคอลัมน์ซ้ายให้กลับมา */
+    .resume-left {
+        border-right: 1px solid #E5E7EB !important;
+        border-bottom: none !important;
+        padding: 35px 25px !important;
+    }
+
     @page { size: A4 portrait; margin: 0; }
 }
 
