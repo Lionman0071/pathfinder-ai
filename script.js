@@ -457,7 +457,7 @@ document.getElementById("pathfinderForm").addEventListener("submit", async funct
             "profileHTML": "เขียนสรุปประวัติย่อแบบมืออาชีพ 1-2 ย่อหน้า โดยใช้แท็ก <p>",
             "experienceHTML": "เรียบเรียงประสบการณ์ให้สวยงาม ใช้ <ul> และ <li>",
             "educationHTML": "เรียบเรียงการศึกษาให้สวยงาม ใช้ <ul> และ <li>",
-            "skillsHTML": "จัดกลุ่ม Hard Skills, Soft Skills และ งานอดิเรก ใช้ <ul> และ <li>"
+            "skillsHTML": "สร้าง <ul> และ <li> แยกเป็น 2 ข้อคือ <li><strong>Hard Skills:</strong> ...</li> และ <li><strong>Hobbies & Interests:</strong> ...</li> (ห้ามนำ Soft Skills มาใส่ในหัวข้อนี้เด็ดขาดเพราะถูกแยกไว้ส่วนอื่นแล้ว)"
         }
     }`;
 
