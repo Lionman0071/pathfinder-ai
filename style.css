@@ -189,10 +189,29 @@ button[type="submit"]:hover { background: var(--primary-hover); transform: trans
 .resume-right-content p { margin-bottom: 12px; text-align: justify; }
 
 /* จัดรูปแบบ Timeline ให้ Experience & Education */
-.resume-right-content ul { list-style-type: none; padding-left: 15px; border-left: 2px solid #E5E7EB; margin-bottom: 15px; }
-.resume-right-content li { position: relative; padding-left: 15px; margin-bottom: 15px; }
-.resume-right-content li::before { content: ''; position: absolute; left: -20px; top: 5px; width: 8px; height: 8px; background: white; border: 2px solid var(--theme-color); border-radius: 50%; }
-
+.resume-right-content ul { 
+    list-style-type: none; 
+    padding-left: 0; 
+    margin-left: 8px; 
+    border-left: 2px solid #E5E7EB; 
+    margin-bottom: 25px; 
+}
+.resume-right-content li { 
+    position: relative; 
+    padding-left: 25px; 
+    margin-bottom: 15px; 
+}
+.resume-right-content li::before { 
+    content: ''; 
+    position: absolute; 
+    left: -8px; /* ปรับให้อยู่กึ่งกลางเส้นตรงเป๊ะ (คำนวณจากขนาดวงกลม 14px และเส้น 2px) */
+    top: 5px; 
+    width: 10px; 
+    height: 10px; 
+    background: white; 
+    border: 2px solid var(--theme-color); 
+    border-radius: 50%; 
+}
 @media (max-width: 768px) {
     .resume-paper { grid-template-columns: 1fr; }
     .resume-left { border-right: none; border-bottom: 1px solid #E5E7EB; padding: 25px; }
