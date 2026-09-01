@@ -304,7 +304,16 @@ body.show-hints .input-group:focus-within .hint-bubble {
 
 @media print {
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    html, body { background: white !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
+    
+    /* เพิ่ม display: block !important; เพื่อยกเลิกการจัดกึ่งกลางของหน้าเว็บเดิม */
+    html, body { 
+        display: block !important; 
+        background: white !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        width: 100% !important; 
+        height: 100% !important; 
+    }
     
     /* ซ่อน UI ทั้งหมดที่ไม่ใช่กระดาษ Resume */
     .app-container, .tab-container, #close-btn, #download-pdf-btn, #copy-text-btn, .theme-selector, .hint-btn, #cards-container, #summary-container, .app-header { display: none !important; }
