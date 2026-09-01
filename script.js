@@ -5,7 +5,6 @@ const institutions = [
     "โรงเรียนเตรียมอุดมศึกษา", "โรงเรียนสวนกุหลาบวิทยาลัย", "โรงเรียนสามเสนวิทยาลัย", "โรงเรียนสตรีวิทยา", "โรงเรียนบดินทรเดชา (สิงห์ สิงหเสนี)", "โรงเรียนเทพศิรินทร์", "โรงเรียนมหิดลวิทยานุสรณ์"
 ];
 
-// ฟังก์ชันแจ้งเตือน Custom Modal พร้อมไอคอน SVG และอนิเมชัน
 function showCustomConfirm(message, isAlert = false, title = "แจ้งเตือน", type = "warning") {
     return new Promise((resolve) => {
         const modal = document.getElementById('custom-alert-modal');
@@ -19,7 +18,6 @@ function showCustomConfirm(message, isAlert = false, title = "แจ้งเต
         titleEl.innerText = title;
         modal.classList.remove('hidden');
 
-        // สร้างไอคอน SVG แบบเคลื่อนไหว
         if (type === "success") {
             iconContainer.innerHTML = `
                 <svg class="icon-success-svg" width="50" height="50" viewBox="0 0 50 50">
@@ -491,36 +489,51 @@ document.getElementById("pathfinderForm").addEventListener("submit", async funct
         });
         document.getElementById("summary-container").innerHTML = `<strong>บทสรุปผู้บริหาร:</strong> ${resultData.summary}`;
 
-        const imgHtml = profileImageBase64 ? `<img src="${profileImageBase64}" class="resume-photo">` : `<div class="resume-photo" style="background:#E5E7EB; display:flex; align-items:center; justify-content:center; color:#9CA3AF; font-size:12px; text-align:center;">รูปถ่าย<br>1.5 นิ้ว</div>`;
+        const imgHtml = profileImageBase64 ? `<img src="${profileImageBase64}" class="resume-photo">` : `<div class="photo-placeholder">รูปถ่าย<br>1.5 นิ้ว</div>`;
         
         let contactHtml = "";
-        if(phone) contactHtml += `📞 ${phone} &nbsp;&nbsp; `;
-        if(email) contactHtml += `✉️ ${email} &nbsp;&nbsp; `;
-        if(nationality || ethnicity) contactHtml += `<br>👤 สัญชาติ: ${nationality || '-'} / เชื้อชาติ: ${ethnicity || '-'} &nbsp;&nbsp; `;
-        if(address) contactHtml += `<br>📍 ${address} &nbsp;&nbsp; `;
-        if(portfolio) contactHtml += `<br>🔗 ${portfolio}`;
+        if(phone) contactHtml += `<div class="resume-contact-item">📞 ${phone}</div>`;
+        if(email) contactHtml += `<div class="resume-contact-item">✉️ ${email}</div>`;
+        if(address) contactHtml += `<div class="resume-contact-item">📍 ${address}</div>`;
+        if(portfolio) contactHtml += `<div class="resume-contact-item">🔗 ${portfolio}</div>`;
+        if(nationality || ethnicity) contactHtml += `<div class="resume-contact-item">👤 ${nationality || '-'}/${ethnicity || '-'}</div>`;
+
+        let softSkillsHtml = softSkillValues.map(s => `<li>${s}</li>`).join('');
 
         const resumeFullHtml = `
-            <div style="font-size: 22px; font-weight: bold; letter-spacing: 3px; color: var(--primary-color); margin-bottom: 20px; text-transform: uppercase;">RESUME</div>
-            <div class="resume-header">
-                ${imgHtml}
-                <div class="resume-contact">
-                    <h1>${name}</h1>
-                    <p>${contactHtml}</p>
+            <div class="resume-left">
+                <div class="resume-photo-box">${imgHtml}</div>
+                
+                <div class="resume-section">
+                    <h2>CONTACT</h2>
+                    ${contactHtml}
+                </div>
+                
+                <div class="resume-section">
+                    <h2>SOFT SKILLS</h2>
+                    <ul class="resume-list">${softSkillsHtml}</ul>
                 </div>
             </div>
-            <div class="resume-body">
-                <h2>Profile Summary</h2>
-                ${resultData.resume.profileHTML}
+            
+            <div class="resume-right">
+                <div class="resume-header-box">
+                    <h1>${name}</h1>
+                    <p>PROFESSIONAL RESUME</p>
+                </div>
                 
-                <h2>Experience</h2>
-                ${resultData.resume.experienceHTML}
-                
-                <h2>Education</h2>
-                ${resultData.resume.educationHTML}
-                
-                <h2>Skills, Interests & Hobbies</h2>
-                ${resultData.resume.skillsHTML}
+                <div class="resume-right-content">
+                    <h2>PROFILE SUMMARY</h2>
+                    ${resultData.resume.profileHTML}
+                    
+                    <h2 style="margin-top: 25px;">EXPERIENCE</h2>
+                    ${resultData.resume.experienceHTML}
+                    
+                    <h2 style="margin-top: 25px;">EDUCATION</h2>
+                    ${resultData.resume.educationHTML}
+                    
+                    <h2 style="margin-top: 25px;">SKILLS & HOBBIES</h2>
+                    ${resultData.resume.skillsHTML}
+                </div>
             </div>
         `;
         
@@ -659,7 +672,6 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
         fillDynamicList('list-soft-skills', parsedData.softSkills);
         fillDynamicList('list-experience', parsedData.experience);
 
-        // ปิดหน้าโหลดก่อนแสดงผลสำเร็จ
         clearInterval(importInterval);
         document.getElementById("loading-overlay").classList.add("hidden");
 
@@ -667,7 +679,6 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
         fileInput.value = '';
 
     } catch (error) {
-        // ปิดหน้าโหลดก่อนแจ้งเตือน Error
         clearInterval(importInterval);
         document.getElementById("loading-overlay").classList.add("hidden");
 
@@ -675,9 +686,6 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
     }
 });
 
-// ----------------------------------------------------
-// ระบบปุ่มเปิด-ปิดคำแนะนำ (Hint Toggle)
-// ----------------------------------------------------
 const hintBtn = document.getElementById('hint-toggle-btn');
 if(hintBtn) {
     hintBtn.addEventListener('click', () => {
@@ -692,9 +700,6 @@ if(hintBtn) {
     });
 }
 
-// ----------------------------------------------------
-// ระบบคัดลอกข้อความ (Export Text)
-// ----------------------------------------------------
 const copyBtn = document.getElementById('copy-text-btn');
 if(copyBtn) {
     copyBtn.addEventListener('click', async () => {
@@ -727,3 +732,19 @@ if(copyBtn) {
         }
     });
 }
+
+// ----------------------------------------------------
+// ระบบเปลี่ยนสีธีม Resume (Theme Selector)
+// ----------------------------------------------------
+document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        const color = e.target.getAttribute('data-color');
+        const paper = document.getElementById('resume-document');
+        if(paper) {
+            paper.style.setProperty('--theme-color', color);
+        }
+    });
+});

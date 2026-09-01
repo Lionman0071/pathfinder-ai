@@ -251,15 +251,24 @@
             </div>
 
             <div id="content-resume" class="tab-content hidden">
-                <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: flex-start; flex-wrap: wrap;">
-                    <button id="copy-text-btn" class="secondary-btn" style="width: auto; padding: 10px 20px; background: #3B82F6;">📋 คัดลอกข้อความ</button>
-                    <button id="download-pdf-btn" class="secondary-btn" style="width: auto; padding: 10px 20px;">📥 ดาวน์โหลดเป็น PDF</button>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: space-between; flex-wrap: wrap; align-items: center; background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="display: flex; gap: 10px;">
+                        <button id="copy-text-btn" class="secondary-btn" style="width: auto; padding: 10px 20px; background: #3B82F6;">📋 คัดลอกข้อความ</button>
+                        <button id="download-pdf-btn" class="secondary-btn" style="width: auto; padding: 10px 20px;">📥 ดาวน์โหลด PDF</button>
+                    </div>
+                    <div class="theme-selector" style="display: flex; gap: 10px; align-items: center;">
+                        <span style="font-size: 14px; color: #4B5563; font-weight: 600;">เลือกสีธีม:</span>
+                        <button type="button" class="theme-btn active" data-color="#2C3E50" style="background: #2C3E50;"></button>
+                        <button type="button" class="theme-btn" data-color="#4F46E5" style="background: #4F46E5;"></button>
+                        <button type="button" class="theme-btn" data-color="#059669" style="background: #059669;"></button>
+                        <button type="button" class="theme-btn" data-color="#B91C1C" style="background: #B91C1C;"></button>
+                        <button type="button" class="theme-btn" data-color="#9333EA" style="background: #9333EA;"></button>
+                    </div>
                 </div>
                 <div class="resume-wrapper">
                     <div id="resume-document" class="resume-paper"></div>
                 </div>
             </div>
-        </div>
     </div>
     
     <script src="script.js"></script>
