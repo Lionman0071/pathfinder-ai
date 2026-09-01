@@ -321,3 +321,8 @@ body.show-hints .input-group:focus-within .hint-bubble {
     visibility: visible;
     transform: translateY(5px);
 }
+
+/* บังคับให้หน้าต่างแจ้งเตือนอยู่หน้าสุดของเว็บเสมอ */
+#custom-alert-modal {
+    z-index: 10000 !important;
+}
