@@ -309,54 +309,47 @@ body.show-hints .input-group:focus-within .hint-bubble {
         margin: 0 !important; 
         padding: 0 !important; 
         display: block !important;
-        height: auto !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        overflow: hidden !important;
     }
     
-    /* ซ่อน UI ทั้งหมดที่ไม่ใช่กระดาษ Resume */
+    /* ซ่อน UI ทั้งหมดที่ไม่ใช่เรซูเม่ */
     .app-container, .tab-container, #close-btn, #download-pdf-btn, #copy-text-btn, .theme-selector, .hint-btn, #cards-container, #summary-container, .app-header { 
         display: none !important; 
     }
     
-    /* เคลียร์ระยะห่างและจัดโครงสร้างกล่องครอบใหม่ให้อยู่ใน Flow ปกติ */
-    .overlay { 
+    /* ล้างค่าโครงสร้างเว็บทั้งหมดให้เรียบเป็นหน้ากระดาษเปล่า */
+    .overlay, .result-content, .tab-content, .resume-wrapper { 
         position: static !important; 
-        background: transparent !important; 
-        display: block !important;
-        width: 100% !important;
-        height: auto !important;
-        padding: 0 !important;
-    }
-    
-    .result-content { 
-        position: static !important;
         background: transparent !important; 
         margin: 0 !important; 
         padding: 0 !important; 
+        border: none !important; 
         box-shadow: none !important; 
         width: 100% !important; 
         max-width: 100% !important; 
+        height: auto !important;
         overflow: visible !important; 
     }
     
-    .tab-content, .resume-wrapper { 
-        display: block !important;
-        background: transparent !important; 
-        margin: 0 !important; 
-        padding: 0 !important; 
-    }
-    
-    /* บังคับขนาด A4 และดึงสีพื้นหลังเต็มขอบโดยไม่ทำให้ยุบตัว */
+    /* ล็อกขนาด A4 แบบเป๊ะๆ และบังคับให้อยู่ในหน้าเดียว */
     .resume-paper { 
-        position: relative !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
         box-shadow: none !important; 
         margin: 0 !important; 
         border: none !important;
         width: 210mm !important; 
-        min-height: 297mm !important; 
+        height: 297mm !important; 
+        max-height: 297mm !important;
         display: grid !important; 
         grid-template-columns: 32% 68% !important; 
         overflow: hidden !important; 
         background: linear-gradient(to right, #F3F4F6 0%, #F3F4F6 32%, #FFFFFF 32%, #FFFFFF 100%) !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
     }
 
     .resume-left { 
@@ -364,7 +357,11 @@ body.show-hints .input-group:focus-within .hint-bubble {
         border-bottom: none !important; 
         padding: 35px 25px !important; 
         background-color: transparent !important;
+        height: 100% !important;
     }
 
-    @page { size: A4 portrait; margin: 0; }
+    @page { 
+        size: A4 portrait; 
+        margin: 0; 
+    }
 }
