@@ -264,3 +264,60 @@ button[type="submit"]:hover { background: var(--primary-hover); transform: trans
     stroke-dashoffset: 48;
     animation: checkDraw 0.5s ease forwards 0.2s;
 }
+
+/* --- Hint Bubble & Toggle Button --- */
+.hint-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #FFFFFF;
+    color: var(--text-main);
+    border: 1px solid #D1D5DB;
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: 0.2s;
+    font-family: inherit;
+}
+.hint-btn:hover {
+    background: #F9FAFB;
+    transform: translateY(-2px);
+}
+
+.hint-bubble {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: rgba(31, 41, 55, 0.9);
+    color: #FFFFFF;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 100;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-weight: 400;
+}
+.hint-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    right: 20px;
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent transparent rgba(31, 41, 55, 0.9) transparent;
+}
+
+body.show-hints .input-group:focus-within .hint-bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(5px);
+}

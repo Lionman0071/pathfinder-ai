@@ -674,3 +674,56 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
         await showCustomConfirm("เกิดข้อผิดพลาด: " + error.message, true, "แจ้งเตือนข้อผิดพลาด", "warning");
     }
 });
+
+// ----------------------------------------------------
+// ระบบปุ่มเปิด-ปิดคำแนะนำ (Hint Toggle)
+// ----------------------------------------------------
+const hintBtn = document.getElementById('hint-toggle-btn');
+if(hintBtn) {
+    hintBtn.addEventListener('click', () => {
+        document.body.classList.toggle('show-hints');
+        if (document.body.classList.contains('show-hints')) {
+            hintBtn.innerHTML = '💡 ปิดคำแนะนำ';
+            hintBtn.style.background = '#FFFFFF';
+        } else {
+            hintBtn.innerHTML = '💡 เปิดคำแนะนำ';
+            hintBtn.style.background = '#E5E7EB';
+        }
+    });
+}
+
+// ----------------------------------------------------
+// ระบบคัดลอกข้อความ (Export Text)
+// ----------------------------------------------------
+const copyBtn = document.getElementById('copy-text-btn');
+if(copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+        const data = getCurrentFormData();
+        let text = `RESUME\n\n`;
+        
+        if(data.name) text += `ชื่อ-นามสกุล: ${data.name}\n`;
+        if(data.phone || data.email) text += `ติดต่อ: ${data.phone || '-'} | ${data.email || '-'}\n`;
+        if(data.portfolio) text += `ผลงาน: ${data.portfolio}\n`;
+        if(data.summary) text += `\n[ข้อมูลเบื้องต้น]\n${data.summary}\n`;
+
+        if(data.education && data.education.length > 0) {
+            text += `\n[ประวัติการศึกษา]\n`;
+            data.education.forEach(e => text += `- ${e.degree} สาขา ${e.major} (${e.school})\n`);
+        }
+        
+        if(data.experience && data.experience.length > 0) {
+            text += `\n[ประสบการณ์]\n`;
+            data.experience.forEach(e => text += `- ${e}\n`);
+        }
+
+        if(data.hardSkills && data.hardSkills.length > 0) text += `\n[Hard Skills]: ${data.hardSkills.join(', ')}\n`;
+        if(data.softSkills && data.softSkills.length > 0) text += `[Soft Skills]: ${data.softSkills.join(', ')}\n`;
+
+        try {
+            await navigator.clipboard.writeText(text);
+            await showCustomConfirm("คัดลอกข้อความสำเร็จ สามารถนำไปวางได้เลย", true, "คัดลอกสำเร็จ", "success");
+        } catch(e) {
+            await showCustomConfirm("เกิดข้อผิดพลาดในการคัดลอกข้อความ", true, "แจ้งเตือน", "warning");
+        }
+    });
+}

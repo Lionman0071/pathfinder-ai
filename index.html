@@ -8,11 +8,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <!-- เพิ่มสคริปต์ pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <link rel="icon" type="image/png" href="img/logo.png">
 </head>
-<body>
+<body class="show-hints">
+    <button id="hint-toggle-btn" class="hint-btn">💡 ปิดคำแนะนำ</button>
+
     <datalist id="degree-options">
         <option value="มัธยมศึกษาปีที่ 3 (ม.3)"></option>
         <option value="มัธยมศึกษาปีที่ 6 (ม.6)"></option>
@@ -32,7 +33,6 @@
         <main class="app-content">
             <form id="pathfinderForm" class="data-form">
                 
-                <!-- ส่วนของ Smart Import -->
                 <div class="smart-import-box">
                     <label class="smart-import-label">✨ Smart Import</label>
                     <div class="smart-import-inputs">
@@ -63,6 +63,7 @@
                     <div class="input-group">
                         <label>อธิบายเกี่ยวกับตัวคุณ</label>
                         <textarea id="user-summary" rows="3" placeholder="เช่น เป็นคนชอบเรียนรู้เทคโนโลยีใหม่ๆ มุ่งมั่นพัฒนาตัวเอง..."></textarea>
+                        <div class="hint-bubble">เขียนสรุปจุดเด่น ทักษะ หรือเป้าหมายการทำงานของคุณ</div>
                     </div>
                     
                     <div class="input-row">
@@ -131,6 +132,7 @@
                         </div>
                     </div>
                     <button type="button" class="add-btn" data-target="list-interests" data-placeholder="เพิ่มความชอบ..."><span class="plus-icon">+</span> เพิ่มความชอบ</button>
+                    <div class="hint-bubble">ระบุสิ่งที่ชอบทำในเวลาว่าง หรืองานที่สนใจเป็นพิเศษ</div>
                 </div>
 
                 <div class="input-group">
@@ -142,6 +144,7 @@
                         </div>
                     </div>
                     <button type="button" class="add-btn" data-target="list-hard-skills" data-placeholder="เพิ่ม Hard Skill..."><span class="plus-icon">+</span> เพิ่ม Hard Skill</button>
+                    <div class="hint-bubble">ความสามารถที่ใช้ทำงานจริง เช่น โปรแกรมคอมพิวเตอร์ หรือภาษาต่างประเทศ</div>
                 </div>
 
                 <div class="input-group">
@@ -153,6 +156,7 @@
                         </div>
                     </div>
                     <button type="button" class="add-btn" data-target="list-soft-skills" data-placeholder="เพิ่ม Soft Skill..."><span class="plus-icon">+</span> เพิ่ม Soft Skill</button>
+                    <div class="hint-bubble">ทักษะด้านอารมณ์และสังคม เช่น การทำงานเป็นทีม, การแก้ไขปัญหาเฉพาะหน้า</div>
                 </div>
 
                 <div class="input-group">
@@ -164,11 +168,13 @@
                         </div>
                     </div>
                     <button type="button" class="add-btn" data-target="list-experience" data-placeholder="เพิ่มประสบการณ์..."><span class="plus-icon">+</span> เพิ่มประสบการณ์</button>
+                    <div class="hint-bubble">กิจกรรม กีฬา ชมรม หรือการฝึกงานพาร์ทไทม์ที่ผ่านมา</div>
                 </div>
 
                 <div class="input-group" style="margin-top: 15px;">
                     <label>6. เป้าหมายรายได้ต่อเดือน</label>
                     <input type="text" id="user-income" class="large-input" placeholder="เช่น 15000 หรือ 15000-20000" required>
+                    <div class="hint-bubble">ระบุช่วงรายได้ที่คาดหวัง เพื่อให้ AI ประเมินสายอาชีพที่ตอบโจทย์</div>
                 </div>
 
                 <div class="form-actions">
@@ -210,11 +216,9 @@
         </div>
     </div>
 
-    <!-- หน้าต่างแจ้งเตือน Custom Modal แบบอนิเมชัน -->
     <div id="custom-alert-modal" class="overlay hidden">
         <div class="crop-content" style="max-width: 400px; text-align: center;">
             <div id="custom-alert-icon-container" style="margin-bottom: 12px; display: flex; justify-content: center;">
-                <!-- ไอคอนจะถูกเปลี่ยนด้วย JS -->
             </div>
             <h3 id="custom-alert-title" style="margin-bottom: 10px; color: var(--text-main); font-size: 18px;">แจ้งเตือน</h3>
             <p id="custom-alert-message" style="color: #4B5563; font-size: 14px; margin-bottom: 20px; line-height: 1.5;"></p>
@@ -247,7 +251,10 @@
             </div>
 
             <div id="content-resume" class="tab-content hidden">
-                <button id="download-pdf-btn" class="secondary-btn" style="margin-bottom: 20px; width: auto; padding: 10px 20px;">📥 ดาวน์โหลดเป็น PDF</button>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: flex-start; flex-wrap: wrap;">
+                    <button id="copy-text-btn" class="secondary-btn" style="width: auto; padding: 10px 20px; background: #3B82F6;">📋 คัดลอกข้อความ</button>
+                    <button id="download-pdf-btn" class="secondary-btn" style="width: auto; padding: 10px 20px;">📥 ดาวน์โหลดเป็น PDF</button>
+                </div>
                 <div class="resume-wrapper">
                     <div id="resume-document" class="resume-paper"></div>
                 </div>
