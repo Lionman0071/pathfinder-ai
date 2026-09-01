@@ -255,10 +255,8 @@ body.show-hints .input-group:focus-within .hint-bubble {
 /* คอลัมน์ซ้าย */
 .resume-left { background-color: #F3F4F6; padding: 35px 25px; display: flex; flex-direction: column; border-right: 1px solid #E5E7EB; }
 .resume-photo-box { text-align: center; margin-bottom: 35px; }
-/* ปรับรูปเป็นสี่เหลี่ยมอัตราส่วน 3:4 */
 .resume-photo { width: 120px; height: 160px; border-radius: 8px; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 0 auto; }
 .photo-placeholder { width: 120px; height: 160px; border-radius: 8px; background: #D1D5DB; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6B7280; margin: 0 auto; border: 4px solid white; text-align: center; }
-
 .resume-section { margin-bottom: 25px; }
 .resume-left .resume-section h2 { font-size: 15px; color: var(--theme-color); text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid var(--theme-color); padding-bottom: 5px; margin-bottom: 12px; font-weight: 600; }
 .resume-contact-item { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12px; word-break: break-word; }
@@ -305,31 +303,24 @@ body.show-hints .input-group:focus-within .hint-bubble {
 
 @media print {
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    html, body { display: block !important; background: white !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
+    body { background: white !important; margin: 0 !important; padding: 0 !important; }
     
-    /* ซ่อน UI ทุกตัวที่ไม่เกี่ยวกับการพิมพ์ */
+    /* ซ่อน UI ทั้งหมดที่ไม่ใช่กระดาษ Resume */
     .app-container, .tab-container, #close-btn, #download-pdf-btn, #copy-text-btn, .theme-selector, .hint-btn, #cards-container, #summary-container, .app-header { display: none !important; }
     
-    /* บังคับดึงกล่องผลลัพธ์ไปชิดขอบบนสุด (Top 0) เพื่อลบพื้นที่ว่าง */
-    .overlay, .result-content, .tab-content, .resume-wrapper { 
-        position: absolute !important; top: 0 !important; left: 0 !important;
-        background: transparent !important; margin: 0 !important; padding: 0 !important; 
-        border: none !important; box-shadow: none !important; 
-        width: 100% !important; max-width: 100% !important; 
-    }
+    .overlay { position: static; background: none; }
+    .result-content { box-shadow: none; padding: 0; max-height: none; overflow: visible; width: 100%; max-width: 100%; }
+    .resume-wrapper { background: none; padding: 0; display: block; }
     
-    /* บังคับขนาด A4 และดึงสีพื้นหลังเต็มขอบซ้ายขวา */
+    /* บังคับเลย์เอาต์ 2 คอลัมน์และขนาด A4 เสมอ */
     .resume-paper { 
         box-shadow: none !important; margin: 0 !important; border: none !important;
         width: 210mm !important; min-height: 297mm !important; 
         display: grid !important; grid-template-columns: 32% 68% !important; overflow: hidden !important; 
-        background: linear-gradient(to right, #F3F4F6 0%, #F3F4F6 32%, #FFFFFF 32%, #FFFFFF 100%) !important;
     }
 
-    .resume-left { 
-        border-right: 1px solid #E5E7EB !important; border-bottom: none !important; 
-        padding: 35px 25px !important; background-color: transparent !important;
-    }
+    /* บังคับเส้นคั่นคอลัมน์ซ้ายให้กลับมา */
+    .resume-left { border-right: 1px solid #E5E7EB !important; border-bottom: none !important; padding: 35px 25px !important; }
 
     @page { size: A4 portrait; margin: 0; }
 }
