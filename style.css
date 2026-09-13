@@ -212,15 +212,29 @@ button[type="submit"]:hover { background: var(--primary-hover); transform: trans
 @keyframes slideRight { 0% { opacity: 0; transform: translate(-100%, -50px) rotate(-15deg) scale(0.8); } 100% { opacity: 1; transform: translate(0, 0) rotate(0) scale(1); } }
 
 /* =========================================
-   9. HINT SYSTEM (Tooltips)
+   9. HINT SYSTEM (Toggle Switch)
    ========================================= */
-.hint-btn {
+.hint-toggle-container {
     position: fixed; top: 20px; right: 20px; background: #FFFFFF; color: var(--text-main);
-    border: 1px solid #D1D5DB; padding: 10px 15px; border-radius: 20px; cursor: pointer;
-    font-size: 14px; font-weight: 500; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000;
-    transition: 0.2s; font-family: inherit;
+    border: 1px solid #D1D5DB; padding: 8px 16px; border-radius: 30px;
+    font-size: 14px; font-weight: 500; box-shadow: 0 4px 10px rgba(0,0,0,0.08); z-index: 1000;
+    display: flex; align-items: center; gap: 10px; font-family: inherit; transition: 0.3s;
 }
-.hint-btn:hover { background: #F9FAFB; transform: translateY(-2px); }
+.hint-toggle-container:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
+.hint-toggle-text { cursor: default; }
+
+/* ดีไซน์ Toggle Switch */
+.switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+input:checked + .slider { background-color: var(--primary-color); }
+input:checked + .slider:before { transform: translateX(18px); }
+
+/* ปรับแต่งปุ่มให้จัดวางไอคอนคู่กับข้อความได้สวยงาม */
+.save-btn, .clear-btn, .secondary-btn, .btn-save-action {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
 
 .hint-bubble {
     position: absolute; top: 100%; right: 0; margin-top: 8px; background: rgba(31, 41, 55, 0.9);
