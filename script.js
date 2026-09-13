@@ -545,6 +545,12 @@ document.getElementById("pathfinderForm").addEventListener("submit", async funct
         document.getElementById("result-modal").classList.remove("hidden");
         tabs.careerBtn.click(); 
 
+        // [ส่วนที่เพิ่มใหม่] รีเซ็ตประวัติแชทและอัปเดตข้อมูลผู้ใช้ส่งให้บอท
+        botSystemContext = `ผู้ใช้ชื่อ: ${name}, การศึกษา: ${eduValues.join(", ")}, ประสบการณ์: ${expValues.join(", ")} | อาชีพที่ AI แนะนำคือ: ${resultData.careers.map(c => c.title).join(", ")} | เป้าหมายรายได้: ${income} บาท จงตอบคำถามแบบกระชับ ตรงประเด็น เป็นผู้ช่วยแนะนำอาชีพ`;
+        chatHistory = [];
+        document.getElementById("chatbot-messages").innerHTML = '<div class="chat-msg ai-msg">สวัสดีครับ มีข้อสงสัยเกี่ยวกับผลวิเคราะห์อาชีพ หรืออยากให้ผมช่วยจำลองการสัมภาษณ์งาน ถามมาได้เลยครับ!</div>';
+        document.getElementById("chatbot-toggle-btn").classList.remove("hidden");
+
     } catch (error) {
         clearInterval(textInterval);
         document.getElementById("loading-overlay").classList.add("hidden");
@@ -748,3 +754,96 @@ document.querySelectorAll('.theme-btn').forEach(btn => {
         }
     });
 });
+
+// ----------------------------------------------------
+// ระบบ AI Chatbot (พูดคุยถามตอบเกี่ยวกับอาชีพและ Resume)
+// ----------------------------------------------------
+let chatHistory = [];
+let botSystemContext = "";
+
+const chatFab = document.getElementById("chatbot-toggle-btn");
+const chatWindow = document.getElementById("chatbot-window");
+const chatClose = document.getElementById("chatbot-close-btn");
+const chatInput = document.getElementById("chatbot-input");
+const chatSend = document.getElementById("chatbot-send-btn");
+const chatMessages = document.getElementById("chatbot-messages");
+
+// เปิด/ปิด หน้าต่างแชท
+chatFab.addEventListener("click", () => {
+    chatWindow.classList.toggle("hidden");
+    if(!chatWindow.classList.contains("hidden")) chatInput.focus();
+});
+chatClose.addEventListener("click", () => chatWindow.classList.add("hidden"));
+
+// ระบบปุ่มคำถามด่วน (Quick Chat)
+document.querySelectorAll(".quick-chat-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        chatInput.value = btn.innerText;
+        sendMessageToBot();
+    });
+});
+
+chatSend.addEventListener("click", sendMessageToBot);
+chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessageToBot();
+});
+
+async function sendMessageToBot() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    // แสดงข้อความของผู้ใช้
+    appendChatMessage(text, "user");
+    chatInput.value = "";
+
+    // แสดงแอนิเมชันกำลังพิมพ์
+    const typingId = "typing-" + Date.now();
+    chatMessages.innerHTML += `<div id="${typingId}" class="typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // บันทึกประวัติ
+    chatHistory.push({ role: "user", parts: [{ text: text }] });
+
+    // แนบ Context ของผู้ใช้ไปพร้อมกับคำถามแรก เพื่อให้บอทรู้ว่ากำลังคุยกับใคร/ผลลัพธ์คืออะไร
+    let apiContents = chatHistory.map((msg, index) => {
+        if (index === 0 && msg.role === "user") {
+            return { role: "user", parts: [{ text: `[บริบทข้อมูลผู้ใช้ (ห้ามตอบกลับส่วนนี้): ${botSystemContext}]\n\nคำถามจากผู้ใช้: ${msg.parts[0].text}` }] };
+        }
+        return msg;
+    });
+
+    try {
+        const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: apiContents })
+        });
+
+        if (!response.ok) throw new Error("การเชื่อมต่อ API ขัดข้อง");
+        const data = await response.json();
+        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "ขออภัยครับ ระบบประมวลผลขัดข้อง";
+        
+        // บันทึกคำตอบของ AI ลงประวัติ
+        chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+
+        document.getElementById(typingId).remove();
+        
+        // จัด Format ข้อความเบื้องต้น (ตัวหนาและขึ้นบรรทัดใหม่)
+        let formattedText = aiText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        appendChatMessage(formattedText, "ai", true);
+
+    } catch (error) {
+        document.getElementById(typingId).remove();
+        appendChatMessage("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองส่งใหม่อีกครั้ง", "ai");
+        chatHistory.pop(); // เอาคำถามล่าสุดออกเพื่อให้ผู้ใช้พิมพ์ถามใหม่ได้
+    }
+}
+
+function appendChatMessage(text, sender, isHTML = false) {
+    const div = document.createElement("div");
+    div.className = `chat-msg ${sender === 'user' ? 'user-msg' : 'ai-msg'}`;
+    if (isHTML) div.innerHTML = text;
+    else div.innerText = text;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
