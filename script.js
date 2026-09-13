@@ -390,13 +390,21 @@ tabs.resumeBtn.addEventListener("click", () => {
     tabs.contentCareer.classList.remove("active");
 });
 
-document.getElementById("close-btn").addEventListener("click", () => {
-    // ปิดหน้าต่างผลลัพธ์
-    document.getElementById("result-modal").classList.add("hidden");
-    
-    // ซ่อนปุ่มแชทและหน้าต่างแชท (ถ้าเปิดค้างไว้)
-    document.getElementById("chatbot-toggle-btn").classList.add("hidden");
-    document.getElementById("chatbot-window").classList.add("hidden");
+document.getElementById("close-btn").addEventListener("click", async () => {
+    // 1. เรียกใช้แจ้งเตือน Custom Confirm ที่มีอยู่ในระบบ
+    const isConfirm = await showCustomConfirm(
+        "คุณต้องการปิดหน้าผลลัพธ์ใช่หรือไม่?\n(หากต้องการดูใหม่จะต้องกดวิเคราะห์อีกครั้ง)", 
+        false, 
+        "ยืนยันการปิดหน้าต่าง", 
+        "warning"
+    );
+
+    // 2. ถ้าผู้ใช้กดยืนยัน (ตกลง) ค่อยสั่งซ่อนหน้าต่างทั้งหมด
+    if (isConfirm) {
+        document.getElementById("result-modal").classList.add("hidden");
+        document.getElementById("chatbot-toggle-btn").classList.add("hidden");
+        document.getElementById("chatbot-window").classList.add("hidden");
+    }
 });
 document.getElementById("pathfinderForm").addEventListener("submit", async function (event) {
     event.preventDefault();
