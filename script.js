@@ -390,8 +390,14 @@ tabs.resumeBtn.addEventListener("click", () => {
     tabs.contentCareer.classList.remove("active");
 });
 
-document.getElementById("close-btn").addEventListener("click", () => document.getElementById("result-modal").classList.add("hidden"));
-
+document.getElementById("close-btn").addEventListener("click", () => {
+    // ปิดหน้าต่างผลลัพธ์
+    document.getElementById("result-modal").classList.add("hidden");
+    
+    // ซ่อนปุ่มแชทและหน้าต่างแชท (ถ้าเปิดค้างไว้)
+    document.getElementById("chatbot-toggle-btn").classList.add("hidden");
+    document.getElementById("chatbot-window").classList.add("hidden");
+});
 document.getElementById("pathfinderForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 
