@@ -492,12 +492,11 @@ document.getElementById("pathfinderForm").addEventListener("submit", async funct
         const imgHtml = profileImageBase64 ? `<img src="${profileImageBase64}" class="resume-photo">` : `<div class="photo-placeholder">รูปถ่าย<br>1.5 นิ้ว</div>`;
         
         let contactHtml = "";
-        if(phone) contactHtml += `<div class="resume-contact-item">📞 ${phone}</div>`;
-        if(email) contactHtml += `<div class="resume-contact-item">✉️ ${email}</div>`;
-        if(address) contactHtml += `<div class="resume-contact-item">📍 ${address}</div>`;
-        if(portfolio) contactHtml += `<div class="resume-contact-item">🔗 ${portfolio}</div>`;
-        if(nationality || ethnicity) contactHtml += `<div class="resume-contact-item">👤 ${nationality || '-'}/${ethnicity || '-'}</div>`;
-
+        if(phone) contactHtml += `<div class="resume-contact-item"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> ${phone}</div>`;
+        if(email) contactHtml += `<div class="resume-contact-item"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> ${email}</div>`;
+        if(address) contactHtml += `<div class="resume-contact-item"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.242-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> ${address}</div>`;
+        if(portfolio) contactHtml += `<div class="resume-contact-item"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg> ${portfolio}</div>`;
+        if(nationality || ethnicity) contactHtml += `<div class="resume-contact-item"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> ${nationality || '-'}/${ethnicity || '-'}</div>`;
         let softSkillsHtml = softSkillValues.map(s => `<li>${s}</li>`).join('');
 
         const resumeFullHtml = `
@@ -692,16 +691,13 @@ document.getElementById('btn-smart-import').addEventListener('click', async () =
     }
 });
 
-const hintBtn = document.getElementById('hint-toggle-btn');
-if(hintBtn) {
-    hintBtn.addEventListener('click', () => {
-        document.body.classList.toggle('show-hints');
-        if (document.body.classList.contains('show-hints')) {
-            hintBtn.innerHTML = '💡 ปิดคำแนะนำ';
-            hintBtn.style.background = '#FFFFFF';
+const hintCheckbox = document.getElementById('hint-toggle-checkbox');
+if(hintCheckbox) {
+    hintCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            document.body.classList.add('show-hints');
         } else {
-            hintBtn.innerHTML = '💡 เปิดคำแนะนำ';
-            hintBtn.style.background = '#E5E7EB';
+            document.body.classList.remove('show-hints');
         }
     });
 }
