@@ -847,3 +847,12 @@ function appendChatMessage(text, sender, isHTML = false) {
     chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
+// ทำให้ Quick Chat เลื่อนซ้ายขวาด้วยการกลิ้งเมาส์กลางได้
+const quickChatContainer = document.querySelector('.chatbot-quick-chat');
+if (quickChatContainer) {
+    quickChatContainer.addEventListener('wheel', (evt) => {
+        evt.preventDefault();
+        quickChatContainer.scrollLeft += evt.deltaY;
+    });
+}
